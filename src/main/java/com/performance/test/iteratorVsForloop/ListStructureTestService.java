@@ -8,15 +8,22 @@ import java.util.*;
 
 @Service
 public class ListStructureTestService {
-    private static final int NUM_ELEMENTS = 100000;
+    private static final int NUM_ELEMENTS = 100;
     private static final Random RANDOM = new Random();
 
     public void testPerformance() {
         List<BusinessSchedule> businessScheduleList = createTestData();
 
+        // JIT 컴파일러 워밍업을 위한 워밍업 루프
+        for (int i = 0; i < 10; i++) {
+            runTestWithForLoop(new ArrayList<>(businessScheduleList));
+        }
+
         StopWatch stopWatch = new StopWatch("Performance Testing");
 
+
         // ArrayList 테스트
+        runTestWithIterator(new ArrayList<>(businessScheduleList));
         measureMemoryAndTime("ArrayList Iterator", () -> runTestWithIterator(new ArrayList<>(businessScheduleList)), stopWatch);
         measureMemoryAndTime("ArrayList For Loop", () -> runTestWithForLoop(new ArrayList<>(businessScheduleList)), stopWatch);
         measureMemoryAndTime("ArrayList Enhanced For Loop", () -> runTestWithEnhancedForLoop(new ArrayList<>(businessScheduleList)), stopWatch);
@@ -76,7 +83,6 @@ public class ListStructureTestService {
     }
 
     private EnumMap<BlockType, Integer> getBlockTypeDistribution(List<MonthlyScheduleDTO.BusinessScheduleWithBlockTypeDTO> scheduleDTOs) {
-        // EnumMap을 생성할 때 올바른 타입을 지정하고, 생성자를 올바르게 작성해야 합니다.
         EnumMap<BlockType, Integer> distribution = new EnumMap<>(BlockType.class);
 
         // 모든 BlockType을 초기화하여 0으로 설정
@@ -123,33 +129,31 @@ public class ListStructureTestService {
         return businessSchedules;
     }
 
-    // Iterator를 사용한 성능 테스트 메서드
+    // Iterator
     private void runTestWithIterator(List<BusinessSchedule> businessSchedules) {
         MonthlyScheduleDTO monthlyScheduleDTO = new MonthlyScheduleDTO(businessSchedules);
         List<MonthlyScheduleDTO.BusinessScheduleWithBlockTypeDTO> result = monthlyScheduleDTO.createScheduleDTOsUsingIterator(businessSchedules);
-        // 결과를 사용하거나, 결과를 무시하고 성능만 측정할 수 있습니다.
     }
 
-    // For 루프를 사용한 성능 테스트 메서드
+    // For 루프
     private void runTestWithForLoop(List<BusinessSchedule> businessSchedules) {
         MonthlyScheduleDTO monthlyScheduleDTO = new MonthlyScheduleDTO(businessSchedules);
         List<MonthlyScheduleDTO.BusinessScheduleWithBlockTypeDTO> result = monthlyScheduleDTO.createScheduleDTOsUsingForLoop(businessSchedules);
-        // 결과를 사용하거나, 결과를 무시하고 성능만 측정할 수 있습니다.
     }
 
-    // 향상된 for 문을 사용하는 테스트 메서드
+    // 향상된 for 문
     private void runTestWithEnhancedForLoop(List<BusinessSchedule> businessSchedules) {
         MonthlyScheduleDTO monthlyScheduleDTO = new MonthlyScheduleDTO(businessSchedules);
         monthlyScheduleDTO.createScheduleDTOsUsingEnhancedForLoop(businessSchedules);
     }
 
-    // ListIterator를 사용하는 테스트 메서드
+    // ListIterator
     private void runTestWithListIterator(List<BusinessSchedule> businessSchedules) {
         MonthlyScheduleDTO monthlyScheduleDTO = new MonthlyScheduleDTO(businessSchedules);
         monthlyScheduleDTO.createScheduleDTOsUsingListIterator(businessSchedules);
     }
 
-    // Stream을 사용하는 테스트 메서드
+    // Stream
     private void runTestWithStream(List<BusinessSchedule> businessSchedules) {
         MonthlyScheduleDTO monthlyScheduleDTO = new MonthlyScheduleDTO(businessSchedules);
         monthlyScheduleDTO.createScheduleDTOsUsingStream(businessSchedules);
